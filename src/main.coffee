@@ -1,8 +1,14 @@
 jQuery ->
-  window.
+  r_canvas = jQuery('#drawable')
+  r_ctx = r_canvas.get(0).getContext('2d')
 
-  window.canvas = jQuery('#drawable')
-  window.ctx = canvas.get(0).getContext('2d')
+  window.canvas = document.createElement('canvas')
+  canvas.width = r_canvas.width()
+  canvas.height = r_canvas.height()
+  window.ctx = canvas.getContext('2d')
+  window.canvas = jQuery(canvas)
+  canvas.width(r_canvas.width())
+  canvas.height(r_canvas.height())
 
   worldAABB = new b2AABB()
   worldAABB.minVertex.Set(-1000, -1000)
@@ -23,7 +29,39 @@ jQuery ->
     keyState[e.which] = false
   )
 
+
+  fps_canvas = jQuery('#fps')
+  fps_ctx = fps_canvas.get(0).getContext('2d')
+  fpsOffset = 0
+
+  lastUpdate = (new Date()).getMilliseconds()
   run = () ->
-    game.update(1000 / game.fps, keyState)
+    now = (new Date().getMilliseconds())
+    diff = now - lastUpdate
+    if (diff < 0)
+      diff += 1000
+    lastUpdate = now
+    game.update(diff, keyState)
     game.draw()
-  intervalID = setInterval(run, 1000 / game.fps)
+    r_ctx.save()
+    r_ctx.fillStyle = 'white'
+    r_ctx.fillRect(0, 0, r_canvas.width(), r_canvas.height())
+    r_ctx.drawImage(canvas.get(0), 0, 0)
+    r_ctx.restore()
+
+    actualFPS = 1000 / diff
+    percent = (1 - actualFPS/game.fps) * fps_canvas.height()
+    fps_ctx.fillStyle = "black"
+    fps_ctx.fillRect(fpsOffset, 0, 1, fps_canvas.height())
+    fps_ctx.fillStyle = "white"
+    fps_ctx.fillRect(fpsOffset, 0, 1, percent)
+    fpsOffset = (fpsOffset + 1) % fps_canvas.width()
+    fps_ctx.fillStyle = "yellow"
+    fps_ctx.fillRect(fpsOffset, 0, 1, fps_canvas.height())
+
+    if (actualFPS < 10)
+      console.log(actualFPS)
+
+    requestAnimationFrame(run)
+  requestAnimationFrame(run)
+#  intervalID = setInterval(run, 1000 / game.fps)

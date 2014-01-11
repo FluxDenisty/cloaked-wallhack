@@ -29,7 +29,7 @@ jQuery ->
       ctx.fillStyle = 'red'
       ctx.beginPath();
       pos = @body.GetOriginPosition()
-      ctx.translate(pos.x * SCALE, pos.y * SCALE)
+      ctx.translate(Math.floor(pos.x * SCALE), Math.floor(pos.y * SCALE))
       ctx.arc(0, 0, SCALE, 0, 2*Math.PI);
       ctx.fill()
       ctx.restore()

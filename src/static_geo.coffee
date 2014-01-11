@@ -18,7 +18,7 @@ jQuery ->
       ctx.save()
       ctx.fillStyle = 'blue'
       pos = @body.GetOriginPosition()
-      ctx.translate(pos.x * SCALE, pos.y * SCALE)
+      ctx.translate(Math.floor(pos.x * SCALE), Math.floor(pos.y * SCALE))
       ctx.rotate(@body.GetRotation())
       ctx.translate(-@width / 2 * SCALE, -@height / 2 * SCALE)
       ctx.fillRect(0, 0, @width * SCALE, @height * SCALE)
