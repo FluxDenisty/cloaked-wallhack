@@ -2,14 +2,15 @@ jQuery ->
   class window.Player
     constructor: (@world) ->
       @size = 1
+      @speed = 1000
 
       circleDef = new b2CircleDef()
       circleDef.density = 1.0
       circleDef.radius = @size
       circleDef.restitution = 1.0
-      circleDef.friction = 0.0
       bodyDef = new b2BodyDef()
       bodyDef.allowSleep = false
+      bodyDef.linearDamping = 0.5
       bodyDef.type = b2Body.b2_dynamicBody
       bodyDef.AddShape(circleDef)
       bodyDef.position.Set(0, 0)
@@ -20,10 +21,10 @@ jQuery ->
     update: (diff, movement) ->
       if movement.Length() > 0
         force = movement.Copy()
-        force.Multiply(5)
-        console.log "Applying force of: "
-        console.log force
+        force.Multiply(@speed)
         @body.ApplyForce(force, @body.GetOriginPosition())
+        vel = @body.GetLinearVelocity()
+        speed = vel.Length()
 
     draw: () ->
       ctx.save()
