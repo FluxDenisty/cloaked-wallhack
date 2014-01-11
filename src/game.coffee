@@ -5,11 +5,22 @@ jQuery ->
     constructor: (@world, @fps) ->
       @player = new Player(@world)
 
-    update: (diff) ->
+    update: (diff, keyState) ->
       timeStep = 1.0 / @fps
       iteration = 1
 
-      @player.update(diff)
+      movement = new b2Vec2(0, 0)
+      if (keyState[87] == true)
+        movement.y -= 1
+      if (keyState[83] == true)
+        movement.y += 1
+      if (keyState[65] == true)
+        movement.x -= 1
+      if (keyState[68] == true)
+        movement.x += 1
+      movement.Normalize()
+
+      @player.update(diff, movement)
       @world.Step(timeStep, iteration)
 
     draw: () ->
