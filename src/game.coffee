@@ -17,7 +17,7 @@ jQuery ->
       @world.SetContactListener(@)
 
       @walls = []
-      @walls.push(new StaticGeo(@world, 5, 1, new b2Vec2(0, 3)))
+#      @walls.push(new StaticGeo(@world, 5, 1, new b2Vec2(0, 3)))
       @walls.push(new StaticGeo(@world, 1, 5, new b2Vec2(5, 0)))
 
       @enemies = []

@@ -45,14 +45,14 @@ jQuery ->
 
     update: (diff) ->
       if (@watching?)
-        @colour = 'red'
         epos = @body.GetPosition()
         ppos = @watching.body.GetPosition()
         # vector from player to enemy
         line = epos.Copy()
         line.Subtract(ppos)
         angle = Math.atan(line.y / line.x)
-        console.log angle
+        if (!angle?)
+          angle = 0
         up = new b2Vec2()
         up.x = 1
         up.y = Math.tan(angle + Math.PI / 2)
@@ -62,6 +62,23 @@ jQuery ->
         @top.Add(up)
         @bottom = ppos.Copy()
         @bottom.Subtract(up)
+
+        hits = 0
+        game.walls.forEach((wall) ->
+          fixture = wall.body.GetBody().GetFixtureList()
+          input = new Box2D.Collision.b2RayCastInput(epos, ppos)
+          output = new Box2D.Collision.b2RayCastOutput()
+          window.res = fixture.RayCast(output, input)
+          if (res)
+            hits += 1
+          window.output = output
+          window.input = input
+        )
+        if (hits > 0)
+          @colour = 'orange'
+        else
+          @colour = 'red'
+
 
       else
         @colour = 'grey'
