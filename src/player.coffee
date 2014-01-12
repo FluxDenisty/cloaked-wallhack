@@ -10,6 +10,8 @@ jQuery ->
       circleDef.density = 1.0
       circleDef.restitution = 0.0
       circleDef.friction = 0.1
+      circleDef.filter.categoryBits = 0x2
+      circleDef.filter.maskBits = 0x1 | 0x4 | 0x8
       bodyDef = new b2BodyDef()
       bodyDef.type = b2Body.b2_dynamicBody
       bodyDef.allowSleep = false

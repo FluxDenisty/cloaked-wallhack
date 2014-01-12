@@ -14,12 +14,14 @@ jQuery ->
 
   class window.Game
     constructor: (@world, @fps) ->
+      @world.SetContactListener(@)
+
       @walls = []
       @walls.push(new StaticGeo(@world, 5, 1, new b2Vec2(0, 3)))
       @walls.push(new StaticGeo(@world, 1, 5, new b2Vec2(5, 0)))
 
       @enemies = []
-      # @enemies.push(new Enemy(@world, new b2Vec2(7, 0)))
+      @enemies.push(new Enemy(@world, new b2Vec2(7, 0)))
 
       @player = new Player(@world)
 
@@ -40,6 +42,19 @@ jQuery ->
 
       @player.update(diff, movement)
       @world.Step(diff / 1000, 1, 1)
+
+    PreSolve: (a, b, c, d, e) ->
+      console.log 'GOT IT'
+
+    BeginContact: (a, b, c, d, e) ->
+      console.log 'GOT IT'
+
+    PostSolve: (a, b, c, d, e) ->
+      console.log 'GOT IT'
+
+    EndContact: (a, b, c, d, e) ->
+      console.log 'GOT IT'
+
 
     draw: () ->
       ctx.save()

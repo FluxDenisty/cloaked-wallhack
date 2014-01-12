@@ -7,6 +7,8 @@ jQuery ->
       boxDef.shape.SetAsBox(@width / 2, @height / 2)
       boxDef.density = 1.0
       boxDef.restitution = 0.0
+      boxDef.filter.categoryBits = 0x1
+      boxDef.filter.maskBits = ~0x0
       bodyDef = new b2BodyDef()
       bodyDef.type = b2Body.b2_staticBody
       bodyDef.linearDamping = 1.0
