@@ -11,11 +11,11 @@ jQuery ->
   canvas.height(r_canvas.height())
 
   worldAABB = new b2AABB()
-  worldAABB.minVertex.Set(-1000, -1000)
-  worldAABB.maxVertex.Set(1000, 1000)
+  worldAABB.lowerBound.Set(-1000, -1000)
+  worldAABB.upperBound.Set(1000, 1000)
   gravity = new b2Vec2(0, 0)
   doSleep = true
-  world = new b2World(worldAABB, gravity, doSleep)
+  world = new b2World(gravity, doSleep)
 
   game = new Game(world, 60)
 
@@ -34,12 +34,10 @@ jQuery ->
   fps_ctx = fps_canvas.get(0).getContext('2d')
   fpsOffset = 0
 
-  lastUpdate = (new Date()).getMilliseconds()
+  lastUpdate = (new Date()).getTime()
   run = () ->
-    now = (new Date().getMilliseconds())
+    now = (new Date().getTime())
     diff = now - lastUpdate
-    if (diff < 0)
-      diff += 1000
     lastUpdate = now
     game.update(diff, keyState)
     game.draw()
@@ -58,9 +56,6 @@ jQuery ->
     fpsOffset = (fpsOffset + 1) % fps_canvas.width()
     fps_ctx.fillStyle = "yellow"
     fps_ctx.fillRect(fpsOffset, 0, 1, fps_canvas.height())
-
-    if (actualFPS < 10)
-      console.log(actualFPS)
 
     requestAnimationFrame(run)
   requestAnimationFrame(run)
