@@ -40,13 +40,29 @@ jQuery ->
 
       @colour = 'grey'
       @watching = null
+      @top = new b2Vec2()
+      @bottom = new b2Vec2()
 
     update: (diff) ->
       if (@watching?)
         @colour = 'red'
         epos = @body.GetPosition()
         ppos = @watching.body.GetPosition()
-        line = ppos.Copy().Subtract(epos)
+        # vector from player to enemy
+        line = epos.Copy()
+        line.Subtract(ppos)
+        angle = Math.atan(line.y / line.x)
+        console.log angle
+        up = new b2Vec2()
+        up.x = 1
+        up.y = Math.tan(angle + Math.PI / 2)
+        up.Normalize()
+        up.Multiply(@watching.size)
+        @top = ppos.Copy()
+        @top.Add(up)
+        @bottom = ppos.Copy()
+        @bottom.Subtract(up)
+
       else
         @colour = 'grey'
 
@@ -71,9 +87,21 @@ jQuery ->
       if (@watching?)
         ctx.strokeStyle = 'black'
         ctx.beginPath()
+
         pos = @watching.body.GetPosition()
         ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
         pos = @body.GetPosition()
         ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
+
+        pos = @top
+        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
+        pos = @body.GetPosition()
+        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
+
+        pos = @bottom
+        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
+        pos = @body.GetPosition()
+        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
+
         ctx.stroke()
       ctx.restore()
