@@ -21,7 +21,7 @@ jQuery ->
       @walls.push(new StaticGeo(@world, 1, 5, new b2Vec2(5, 0)))
 
       @enemies = []
-      @enemies.push(new Enemy(@world, new b2Vec2(7, 0)))
+      @enemies.push(new Enemy(@world, new b2Vec2(7, 0), Math.PI / 2))
 
       @player = new Player(@world)
 
@@ -40,20 +40,62 @@ jQuery ->
         movement.x += 1
       movement.Normalize()
 
+      @enemies.forEach((enemy) ->
+        enemy.update(diff)
+      )
+
       @player.update(diff, movement)
       @world.Step(diff / 1000, 1, 1)
 
-    PreSolve: (a, b, c, d, e) ->
-      console.log 'GOT IT'
+    PreSolve: (contact, manifold) ->
 
-    BeginContact: (a, b, c, d, e) ->
-      console.log 'GOT IT'
+    PostSolve: (contact, manifold) ->
 
-    PostSolve: (a, b, c, d, e) ->
-      console.log 'GOT IT'
+    BeginContact: (contact) ->
+      a = contact.GetFixtureA().GetBody().GetUserData()
+      b = contact.GetFixtureB().GetBody().GetUserData()
 
-    EndContact: (a, b, c, d, e) ->
-      console.log 'GOT IT'
+      if (a instanceof Enemy)
+        if (contact.GetFixtureA().IsSensor())
+          sight = a
+        else
+          enemy = a
+      else if (a instanceof Player)
+        player = a
+
+      if (b instanceof Enemy)
+        if (contact.GetFixtureA().IsSensor())
+          sight = b
+        else
+          enemy = b
+      else if (b instanceof Player)
+        player = b
+
+      if (player && sight)
+        sight.watching = player
+
+    EndContact: (contact) ->
+      a = contact.GetFixtureA().GetBody().GetUserData()
+      b = contact.GetFixtureB().GetBody().GetUserData()
+
+      if (a instanceof Enemy)
+        if (contact.GetFixtureA().IsSensor())
+          sight = a
+        else
+          enemy = a
+      else if (a instanceof Player)
+        player = a
+
+      if (b instanceof Enemy)
+        if (contact.GetFixtureA().IsSensor())
+          sight = b
+        else
+          enemy = b
+      else if (b instanceof Player)
+        player = b
+
+      if (player && sight)
+        sight.watching = null
 
 
     draw: () ->
@@ -66,13 +108,14 @@ jQuery ->
       pos = @player.body.GetPosition()
       ctx.translate(-Math.floor(pos.x * SCALE), -Math.floor(pos.y * SCALE))
 
+      @enemies.forEach((enemy) ->
+        enemy.draw()
+      )
+
       @walls.forEach((wall) ->
         wall.draw()
       )
 
-      @enemies.forEach((enemy) ->
-        enemy.draw()
-      )
       ctx.restore()
 
       @player.draw()

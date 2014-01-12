@@ -1,6 +1,6 @@
 jQuery ->
   class window.Enemy
-    constructor: (@world, pos) ->
+    constructor: (@world, pos, angle) ->
       @size = 0.5
       @speed = 13
       @damping = 20
@@ -16,23 +16,39 @@ jQuery ->
       sightDef.shape = new b2PolygonShape()
       @verts = []
       @verts[0] = new b2Vec2( 0,  0)
-      @verts[1] = new b2Vec2( 1,  2)
-      @verts[2] = new b2Vec2(-1,  2)
+      @verts[1] = new b2Vec2( 4,  5)
+      @verts[2] = new b2Vec2(-4,  5)
       sightDef.shape.SetAsArray(@verts)
       sightDef.isSensor = true
       sightDef.filter.categoryBits = 0x8
-      sightDef.filter.maskBits = 0x2
+      sightDef.filter.maskBits = 0x1 | 0x2
 
       bodyDef = new b2BodyDef()
       bodyDef.type = b2Body.b2_dynamicBody
       bodyDef.allowSleep = false
       bodyDef.linearDamping = @damping
+      bodyDef.angularDamping = 0.0
       bodyDef.position.Set(pos.x, pos.y)
+      bodyDef.angle = angle
       @body = world.CreateBody(bodyDef)
       @body.CreateFixture(circleDef)
       @body.CreateFixture(sightDef)
+      @body.SetUserData(@)
+
+      # DEBUG
+      @body.SetAngularVelocity(1)
 
       @colour = 'grey'
+      @watching = null
+
+    update: (diff) ->
+      if (@watching?)
+        @colour = 'red'
+        epos = @body.GetPosition()
+        ppos = @watching.body.GetPosition()
+        line = ppos.Copy().Subtract(epos)
+      else
+        @colour = 'grey'
 
     draw: () ->
       ctx.save()
@@ -50,4 +66,14 @@ jQuery ->
         ctx.lineTo(vert.x * SCALE, vert.y * SCALE)
       )
       ctx.fill()
+      ctx.restore()
+      ctx.save()
+      if (@watching?)
+        ctx.strokeStyle = 'black'
+        ctx.beginPath()
+        pos = @watching.body.GetPosition()
+        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
+        pos = @body.GetPosition()
+        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
+        ctx.stroke()
       ctx.restore()

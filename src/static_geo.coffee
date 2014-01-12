@@ -14,8 +14,8 @@ jQuery ->
       bodyDef.linearDamping = 1.0
       bodyDef.angularDamping = 1.0
       bodyDef.position.Set(pos.x, pos.y)
-      window.def = bodyDef
       @body = world.CreateBody(bodyDef).CreateFixture(boxDef)
+      @body.SetUserData(@)
 
     draw: () ->
       ctx.save()

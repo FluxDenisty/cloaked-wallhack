@@ -20,6 +20,7 @@ jQuery ->
       bodyDef.position.Set(0, 0)
       @body = world.CreateBody(bodyDef)
       @body.CreateFixture(circleDef)
+      @body.SetUserData(@)
 
       window.player = @
 
