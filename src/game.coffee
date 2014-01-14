@@ -1,5 +1,6 @@
 jQuery ->
   window.b2Vec2 = Box2D.Common.Math.b2Vec2
+  window.b2Transform = Box2D.Common.Math.b2Transform
   window.b2BodyDef = Box2D.Dynamics.b2BodyDef
   window.b2Body = Box2D.Dynamics.b2Body
   window.b2FixtureDef = Box2D.Dynamics.b2FixtureDef
@@ -16,19 +17,20 @@ jQuery ->
     constructor: (@world, @fps) ->
       @world.SetContactListener(@)
 
-      @walls = []
-#      @walls.push(new StaticGeo(@world, 5, 1, new b2Vec2(0, 3)))
-      @walls.push(new StaticGeo(@world, 1, 5, new b2Vec2(5, 0)))
+      @walls = [
+        new StaticGeo(@world, 5, 1, new b2Vec2(0, 3))
+        new StaticGeo(@world, 1, 5, new b2Vec2(5, -1))
+      ]
 
-      @enemies = []
-      @enemies.push(new Enemy(@world, new b2Vec2(7, 0), Math.PI / 2))
+      @enemies = [
+        new Enemy(@world, new b2Vec2(3, 0), 0) # Math.PI)
+      ]
 
       @player = new Player(@world)
 
       window.game = @
 
     update: (diff, keyState) ->
-      @world.ClearForces()
       movement = new b2Vec2(0, 0)
       if (keyState[87] == true)
         movement.y -= 1
@@ -44,8 +46,9 @@ jQuery ->
         enemy.update(diff)
       )
 
-      @player.update(diff, movement)
       @world.Step(diff / 1000, 1, 1)
+      @world.ClearForces()
+      @player.update(diff, movement)
 
     PreSolve: (contact, manifold) ->
 
