@@ -16,8 +16,9 @@ jQuery ->
       sightDef.shape = new b2PolygonShape()
       @verts = []
       @verts[0] = new b2Vec2( 0,  0)
-      @verts[1] = new b2Vec2( 5,  4)
-      @verts[2] = new b2Vec2( 5, -4)
+      @verts[1] = new b2Vec2( 5, -4)
+      @verts[2] = new b2Vec2( 7,  0)
+      @verts[3] = new b2Vec2( 5,  4)
       sightDef.shape.SetAsArray(@verts)
       sightDef.isSensor = true
       sightDef.filter.categoryBits = 0x8
@@ -31,14 +32,12 @@ jQuery ->
       bodyDef.position.Set(pos.x, pos.y)
       bodyDef.angle = angle
       @body = world.CreateBody(bodyDef)
-      @body.CreateFixture(circleDef)
+      @circle = @body.CreateFixture(circleDef)
       @sightLine = @body.CreateFixture(sightDef)
       @body.SetUserData(@)
 
       @blarg = new b2Vec2()
       @honk = new b2Vec2()
-      # DEBUG
-#      @body.SetAngularVelocity(1)
 
       @colour = 'grey'
       @watching = null
@@ -66,16 +65,13 @@ jQuery ->
         @honk = bottom.Copy()
 
         blocked = false
-        getAngle = @body.GetAngle()
-        sightAngle = @sightAngle
+        sightLine = @sightLine
         game.walls.forEach((wall) ->
           hits = 0
           [ppos, top, bottom].forEach((vec) ->
             line = epos.Copy()
             line.Subtract(vec)
-            angle = Math.atan(line.y / line.x)
-            angleFromView = (angle - getAngle) % (Math.PI * 2)
-            if (true) # angleFromView <= sightAngle)
+            if (sightLine.TestPoint(vec))
               fixture = wall.body.GetBody().GetFixtureList()
               input = new Box2D.Collision.b2RayCastInput(epos, vec)
               output = new Box2D.Collision.b2RayCastOutput()
@@ -108,7 +104,8 @@ jQuery ->
       ctx.fill()
       ctx.fillStyle = 'yellow'
       ctx.beginPath()
-      ctx.moveTo(@verts[2].x * SCALE, @verts[2].y * SCALE)
+      end = @verts.length - 1
+      ctx.moveTo(@verts[end].x * SCALE, @verts[end].y * SCALE)
       @verts.forEach((vert) ->
         ctx.lineTo(vert.x * SCALE, vert.y * SCALE)
       )

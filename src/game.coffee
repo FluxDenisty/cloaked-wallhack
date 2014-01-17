@@ -42,12 +42,13 @@ jQuery ->
         movement.x += 1
       movement.Normalize()
 
+      @world.Step(diff / 1000, 1, 1)
+      @world.ClearForces()
+
       @enemies.forEach((enemy) ->
         enemy.update(diff)
       )
 
-      @world.Step(diff / 1000, 1, 1)
-      @world.ClearForces()
       @player.update(diff, movement)
 
     PreSolve: (contact, manifold) ->
