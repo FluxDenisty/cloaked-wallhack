@@ -86,7 +86,7 @@ jQuery ->
             console.log "other hits"
             hits += 1
         )
-        if (hits == 3)
+        if (hits == checkPoints.length)
           @colour = 'orange'
         else
           @colour = 'red'
@@ -114,7 +114,7 @@ jQuery ->
       ctx.fill()
       ctx.restore()
       ctx.save()
-      if (false && @watching?)
+      if (@watching?)
         ctx.strokeStyle = 'black'
         ctx.beginPath()
 
