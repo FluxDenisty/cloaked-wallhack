@@ -19,7 +19,8 @@ jQuery ->
 
       @walls = [
         new StaticGeo(@world, 5, 1, new b2Vec2(0, 3))
-        new StaticGeo(@world, 1, 5, new b2Vec2(5, -1))
+        new StaticGeo(@world, 1, 2, new b2Vec2(4, -1.2))
+        new StaticGeo(@world, 1, 2, new b2Vec2(4,  1.2))
       ]
 
       @enemies = [

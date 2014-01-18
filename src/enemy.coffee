@@ -36,16 +36,17 @@ jQuery ->
       @sightLine = @body.CreateFixture(sightDef)
       @body.SetUserData(@)
 
-      @blarg = new b2Vec2()
-      @honk = new b2Vec2()
+      @debugDrawCheckPoints = []
 
       @colour = 'grey'
       @watching = null
 
     update: (diff) ->
       if (@watching?)
+        checkPoints = []
         epos = @body.GetPosition()
         ppos = @watching.body.GetPosition()
+        checkPoints.push(ppos)
         # vector from player to enemy
         line = epos.Copy()
         line.Subtract(ppos)
@@ -59,35 +60,36 @@ jQuery ->
         up.Multiply(@watching.size)
         top = ppos.Copy()
         top.Add(up)
+        checkPoints.push(top)
         bottom = ppos.Copy()
         bottom.Subtract(up)
-        @blarg = top.Copy()
-        @honk = bottom.Copy()
+        checkPoints.push(bottom)
+        @debugDrawCheckPoints = checkPoints
 
-        blocked = false
         sightLine = @sightLine
-        game.walls.forEach((wall) ->
-          hits = 0
-          [ppos, top, bottom].forEach((vec) ->
-            line = epos.Copy()
-            line.Subtract(vec)
-            if (sightLine.TestPoint(vec))
+        hits = 0
+        checkPoints.forEach((vec) ->
+          if (sightLine.TestPoint(vec))
+            game.walls.every((wall) ->
               fixture = wall.body.GetBody().GetFixtureList()
               input = new Box2D.Collision.b2RayCastInput(epos, vec)
               output = new Box2D.Collision.b2RayCastOutput()
               res = fixture.RayCast(output, input)
               if (res)
+                console.log "this hits"
                 hits += 1
-            else
-              hits += 1
-          )
-          if (hits == 3)
-            blocked = true
+                return false
+              else
+                return true
+            )
+          else
+            console.log "other hits"
+            hits += 1
         )
-        if (!blocked)
-          @colour = 'red'
-        else
+        if (hits == 3)
           @colour = 'orange'
+        else
+          @colour = 'red'
 
 
       else
@@ -112,24 +114,15 @@ jQuery ->
       ctx.fill()
       ctx.restore()
       ctx.save()
-      if (@watching?)
+      if (false && @watching?)
         ctx.strokeStyle = 'black'
         ctx.beginPath()
 
-        pos = @watching.body.GetPosition()
-        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
-        pos = @body.GetPosition()
-        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
-
-        pos = @blarg
-        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
-        pos = @body.GetPosition()
-        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
-
-        pos = @honk
-        ctx.moveTo(pos.x * SCALE, pos.y * SCALE)
-        pos = @body.GetPosition()
-        ctx.lineTo(pos.x * SCALE, pos.y * SCALE)
+        bodyPos = @body.GetPosition()
+        @debugDrawCheckPoints.forEach((vec) ->
+          ctx.moveTo(vec.x * SCALE, vec.y * SCALE)
+          ctx.lineTo(bodyPos.x * SCALE, bodyPos.y * SCALE)
+        )
 
         ctx.stroke()
       ctx.restore()
