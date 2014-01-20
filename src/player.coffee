@@ -16,7 +16,7 @@ jQuery ->
       bodyDef.type = b2Body.b2_dynamicBody
       bodyDef.allowSleep = false
       bodyDef.linearDamping = @damping
-      bodyDef.angularDamping = 1.0
+      bodyDef.angularDamping = 20.0
       bodyDef.position.Set(0, 0)
       @body = world.CreateBody(bodyDef)
       @body.CreateFixture(circleDef)

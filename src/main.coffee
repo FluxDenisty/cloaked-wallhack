@@ -35,7 +35,7 @@ jQuery ->
   fpsOffset = 0
 
   lastUpdate = (new Date()).getTime()
-  run = () ->
+  window.run = () ->
     now = (new Date().getTime())
     diff = now - lastUpdate
     lastUpdate = now
@@ -56,7 +56,7 @@ jQuery ->
     fpsOffset = (fpsOffset + 1) % fps_canvas.width()
     fps_ctx.fillStyle = "yellow"
     fps_ctx.fillRect(fpsOffset, 0, 1, fps_canvas.height())
-
-    requestAnimationFrame(run)
+    if (keyState[48] != true)
+      requestAnimationFrame(run)
   requestAnimationFrame(run)
 #  intervalID = setInterval(run, 1000 / game.fps)

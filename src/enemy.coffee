@@ -28,7 +28,7 @@ jQuery ->
       bodyDef.type = b2Body.b2_dynamicBody
       bodyDef.allowSleep = false
       bodyDef.linearDamping = @damping
-      bodyDef.angularDamping = 0.0
+      bodyDef.angularDamping = 10.0
       bodyDef.position.Set(pos.x, pos.y)
       bodyDef.angle = angle
       @body = world.CreateBody(bodyDef)
@@ -41,54 +41,59 @@ jQuery ->
       @colour = 'grey'
       @watching = null
 
+    # Returns true if player is visible to this enemy
+    checkVision: () ->
+      checkPoints = []
+      epos = @body.GetPosition()
+      ppos = @watching.body.GetPosition()
+      checkPoints.push(ppos)
+      # vector from player to enemy
+      line = epos.Copy()
+      line.Subtract(ppos)
+      angle = Math.atan(line.y / line.x)
+      if (!angle?)
+        angle = 0
+      up = new b2Vec2()
+      up.x = 1
+      up.y = Math.tan(angle + Math.PI / 2)
+      up.Normalize()
+      up.Multiply(@watching.size)
+      top = ppos.Copy()
+      top.Add(up)
+      checkPoints.push(top)
+      bottom = ppos.Copy()
+      bottom.Subtract(up)
+      checkPoints.push(bottom)
+      @debugDrawCheckPoints = checkPoints
+
+      sightLine = @sightLine
+      hits = 0
+      checkPoints.forEach((vec) ->
+        if (sightLine.TestPoint(vec))
+          game.walls.every((wall) ->
+            fixture = wall.body.GetBody().GetFixtureList()
+            input = new Box2D.Collision.b2RayCastInput(epos, vec)
+            output = new Box2D.Collision.b2RayCastOutput()
+            res = fixture.RayCast(output, input)
+            if (res)
+              hits += 1
+              return false
+            else
+              return true
+          )
+        else
+          hits += 1
+      )
+      return (hits == checkPoints.length)
+
+
+
     update: (diff) ->
       if (@watching?)
-        checkPoints = []
-        epos = @body.GetPosition()
-        ppos = @watching.body.GetPosition()
-        checkPoints.push(ppos)
-        # vector from player to enemy
-        line = epos.Copy()
-        line.Subtract(ppos)
-        angle = Math.atan(line.y / line.x)
-        if (!angle?)
-          angle = 0
-        up = new b2Vec2()
-        up.x = 1
-        up.y = Math.tan(angle + Math.PI / 2)
-        up.Normalize()
-        up.Multiply(@watching.size)
-        top = ppos.Copy()
-        top.Add(up)
-        checkPoints.push(top)
-        bottom = ppos.Copy()
-        bottom.Subtract(up)
-        checkPoints.push(bottom)
-        @debugDrawCheckPoints = checkPoints
-
-        sightLine = @sightLine
-        hits = 0
-        checkPoints.forEach((vec) ->
-          if (sightLine.TestPoint(vec))
-            game.walls.every((wall) ->
-              fixture = wall.body.GetBody().GetFixtureList()
-              input = new Box2D.Collision.b2RayCastInput(epos, vec)
-              output = new Box2D.Collision.b2RayCastOutput()
-              res = fixture.RayCast(output, input)
-              if (res)
-                hits += 1
-                return false
-              else
-                return true
-            )
-          else
-            hits += 1
-        )
-        if (hits == checkPoints.length)
+        if (@checkVision())
           @colour = 'orange'
         else
           @colour = 'red'
-
       else
         @colour = 'grey'
 
