@@ -76,21 +76,18 @@ jQuery ->
               output = new Box2D.Collision.b2RayCastOutput()
               res = fixture.RayCast(output, input)
               if (res)
-                console.log "this hits"
                 hits += 1
                 return false
               else
                 return true
             )
           else
-            console.log "other hits"
             hits += 1
         )
         if (hits == checkPoints.length)
           @colour = 'orange'
         else
           @colour = 'red'
-
 
       else
         @colour = 'grey'
